@@ -13,17 +13,17 @@ pub fn build(b: *std.Build) !void {
     const day_src_path = try std.fmt.allocPrint(gpa, "src/day{}.zig", .{ dnum });
 
     const dmod = b.addModule("aoc-day", .{
-        .source_file = .{ .path = day_src_path }
+        .root_source_file = b.path(day_src_path),
     });
     // std.log.info("Adding day module. Name: aoc-day, Source file: {s}", .{ day_src_path });
 
     const exe = b.addExecutable(.{
         .name = "aoc-zig",
-        .root_source_file = .{ .path = "templates/main.zig" },
+        .root_source_file = b.path("templates/main.zig"),
         .target = target,
         .optimize = optimize,
     });
-    exe.addModule("aoc-day", dmod);
+    exe.root_module.addImport("aoc-day", dmod);
 
     b.installArtifact(exe);
 
@@ -38,7 +38,7 @@ pub fn build(b: *std.Build) !void {
     run_step.dependOn(&run_cmd.step);
 
     const unit_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
